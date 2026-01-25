@@ -218,8 +218,9 @@ disp("While considering the ""Nuclear Fireball Model"" (see: https://doi.org/10.
 disp("");
 disp("Let there be a right-handed Cartesian coordinate system in standard Euclidean space as per ISO 80000-2:2009(E), Eⁿ:");
 disp([sprintf("The target particle of radius Rt= %.2f,", Rt), sprintf(" is envisioned still, with center at (0,0,%.2f)", z_off_t)]);
-disp([sprintf("The projectile particle of radius Rp= %.2f,", Rp), sprintf(" is envisioned displacing along Eⁿ x-axis. For Monte-Carlo analysis purposes it is envisioned to be in an instant of time with its center at (0,0,%.2f).", z_off_p)]);
+disp([sprintf("The projectile particle of radius Rp= %.2f,", Rp), sprintf(" is envisioned as displacing at sub-relativistic speed along Eⁿ x-axis. For Monte-Carlo analysis purposes it is envisioned to be in an instant of time with its center at (0,0,%.2f).", z_off_p)]);
 disp(sprintf("This array allowed to randomly scatter N=%.2f points within a prismatic volume tightly enveloping both the projectile and the target particles.", N));
+disp(" ");
 disp("[03. VOLUMETRIC ANALYSIS]");
 disp("ANALYTIC VOLUMES:");
 prismaticVolume=(2*(2*max(Rp,Rt)))*(Rt+b+Rp); %Refers to the analytical volume containing all Monte Carlo N points. Obtained by choosing the largest particle radius, double it to obtain a prism base side. Double again to obtain prism base area. Multiply by the prism height, equivalent to the product of Rt+b+Rp.
@@ -227,13 +228,13 @@ disp(sprintf("Monte Carlo test volume: %.2f [fm³]", prismaticVolume));
 projectileVolume=(4/3)*pi()*(Rp.^3); % see: https://mathworld.wolfram.com/Sphere.html
 disp(sprintf("Projectile volume: %.2f [fm³]", projectileVolume));
 targetVolume=(4/3)*pi()*(Rt.^3); % see: https://mathworld.wolfram.com/Sphere.html
-disp(sprintf("Target volume: %.2f [fm³]", projectileVolume));
+disp(sprintf("Target volume: %.2f [fm³]", targetVolume));
 disp("");
 disp("MONTE CARLO POINTS:");
 disp(sprintf("Monte Carlo test points (encompassing the volumes of projectile and target), N: %.2f [points]", N));
 projectileSequesteredPoints=length(projectileNucleons); %from all Monte Carlo points N found in prismaticVolume, save the number of points found within the volume of the projectile.
 disp(sprintf("Projectile monte carlo points (assumed to be proportional to all projectile nucleons): %.2f [points]", projectileSequesteredPoints));
-targetSequesteredPoints=length(projectileNucleons); %from all Monte Carlo points N found in prismaticVolume, save the number of points found within the volume of the target.
+targetSequesteredPoints=length(targetNucleons); %from all Monte Carlo points N found in prismaticVolume, save the number of points found within the volume of the target.
 disp(sprintf("Target monte carlo points (assumed to be proportional to all target nucleons): %.2f [points]", targetSequesteredPoints));
 disp("");
 disp("PARTICIPANT POINTS:");
@@ -253,7 +254,7 @@ disp(sprintf("Target total Monte Carlo points: TMP=%.2f [points]",targetSequeste
 disp("");
 disp("It follows that:");
 disp(sprintf("∵ ""...The participant fraction is the ratio of the number of participants to the number of all nucleons..."" (C. Hartnack, ""Student Laboratories, Master SNEAM, Application of the Participant-Spectator-Model, Problem 1"") "));
-Np=(targetParticipantPoints+projectileParticipantPoints)/(projectileSequesteredPoints+targetSequesteredPoints)
+Np=(targetParticipantPoints+projectileParticipantPoints)/(projectileSequesteredPoints+targetSequesteredPoints);
 disp(sprintf("→ Nₚ = (TPP+PPP)/(PMP+TMP)", Np));
 disp("");
 disp(sprintf("⟹ Nₚ = %.2f", Np));
@@ -261,6 +262,3 @@ disp(sprintf("⟹ Nₚ = %.2f", Np));
 %Ensure Octave workspace is clean for other parallel projects
 %clear;
 %close all;
-
-
-
