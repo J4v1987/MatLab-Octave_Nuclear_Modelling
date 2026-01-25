@@ -132,7 +132,7 @@ for i=1:length(prismPointsList)
   endif
 endfor
 
-%Fit plot to equal proportions in all axes and add labels.
+%Plot Projectile participants
 if (plotIt==1)
   plot_fig=figure("visible", "off");
   plot_ax=axes("parent", plot_fig);
@@ -161,13 +161,13 @@ if (plotIt==1)
   %hold(plot_ax, 'on');
 
   % Target participant points plot
-  targetParticipantsPlot=plot3(plot_ax,targetParticipants(:,1),targetParticipants(:,2),targetParticipants(:,3),'m.', 'MarkerSize', del_thkns, 'LineWidth', 0.5);
+  %targetParticipantsPlot=plot3(plot_ax,targetParticipants(:,1),targetParticipants(:,2),targetParticipants(:,3),'m.', 'MarkerSize', del_thkns, 'LineWidth', 0.5);
 
  % Axis and Title setup
   xlabel(plot_ax, 'X-axis');
   ylabel(plot_ax, 'Y-axis');
   zlabel(plot_ax, 'Z-axis');
-  title(plot_ax, 'Acknowledgement volume');
+  title(plot_ax, 'Projectile Participants');
   axis(plot_ax, 'equal');
   %view(plot_ax, 3);
 
@@ -182,12 +182,187 @@ if (plotIt==1)
   drawnow();
 
   % Save the interactive figure (the only one that will support toggling)
-  savefig(plot_fig, "02-prism points.ofig");
+  savefig(plot_fig, "02-projectile participants.ofig");
   % Save the static image for the report (it will show everything ON by default)
   set(plot_fig, "paperpositionmode", "auto");
-  print(plot_fig, "02-prism points.png", "-dpng");
+  print(plot_fig, "02-projectile participants.png", "-dpng");
   close(plot_fig);
 endif
+
+
+
+%Plot Target monte carlo points
+if (plotIt==1)
+  plot_fig=figure("visible", "off");
+  plot_ax=axes("parent", plot_fig);
+
+  % Projectile contour plot
+  projectilePlot=plot3(plot_ax,pp_shadow_list(:,1),pp_shadow_list(:,2),pp_shadow_list(:,3),'b.', 'MarkerSize', del_thkns, 'LineWidth', 2);
+  hold(plot_ax, 'on');
+
+  % Target contour plot
+  targetPlot=plot3(plot_ax,tp_shadow_list(:,1),tp_shadow_list(:,2),tp_shadow_list(:,3),'r.', 'MarkerSize', del_thkns, 'LineWidth', 2);
+  hold(plot_ax, 'on');
+
+  % Prism Points Plot
+  %prismPointsPlot=plot3(plot_ax,prismPointsList(:,1),prismPointsList(:,2),prismPointsList(:,3),'k.', 'MarkerSize', del_thkns, 'LineWidth', 0.5, 'DisplayName', 'Acknowledgement Volume');
+
+  % Projectile points plot
+  %projectileNucleonsPlot=plot3(plot_ax,projectileNucleons(:,1),projectileNucleons(:,2),projectileNucleons(:,3),'k.', 'MarkerSize', del_thkns, 'LineWidth', 0.5);
+  %hold(plot_ax, 'on');
+
+  % Target points plot
+  targetNucleonsPlot=plot3(plot_ax,targetNucleons(:,1),targetNucleons(:,2),targetNucleons(:,3),'m.', 'MarkerSize', del_thkns, 'LineWidth', 0.5);
+  %hold(plot_ax, 'on');
+
+  % Projectile participant points plot
+  %projectileParticipantsPlot=plot3(plot_ax,projectileParticipants(:,1),projectileParticipants(:,2),projectileParticipants(:,3),'c.', 'MarkerSize', del_thkns, 'LineWidth', 0.5);
+  %hold(plot_ax, 'on');
+
+  % Target participant points plot
+  %targetParticipantsPlot=plot3(plot_ax,targetParticipants(:,1),targetParticipants(:,2),targetParticipants(:,3),'m.', 'MarkerSize', del_thkns, 'LineWidth', 0.5);
+
+ % Axis and Title setup
+  xlabel(plot_ax, 'X-axis');
+  ylabel(plot_ax, 'Y-axis');
+  zlabel(plot_ax, 'Z-axis');
+  title(plot_ax, 'Target Monte Carlo Points');
+  axis(plot_ax, 'equal');
+  %view(plot_ax, 3);
+
+  %view(plot_ax, 0, 90); %XY view (trajectory view, top)
+  view(plot_ax, 155, 20); %pseudo-dimetric
+  %view(plot_ax, 0, 0); %XZ view (trajectory view, side)
+  %view(plot_ax, 90, 0); %YZ view (impact parameter view)
+  %view(plot_ax, 0, 90); %XY view (trajectory view, top)
+
+  grid(plot_ax, 'on');
+
+  drawnow();
+
+  % Save the interactive figure (the only one that will support toggling)
+  savefig(plot_fig, "02-target mc points.ofig");
+  % Save the static image for the report (it will show everything ON by default)
+  set(plot_fig, "paperpositionmode", "auto");
+  print(plot_fig, "02-target mc points.png", "-dpng");
+  close(plot_fig);
+endif
+
+
+%Plot Projectile monte carlo points
+if (plotIt==1)
+  plot_fig=figure("visible", "off");
+  plot_ax=axes("parent", plot_fig);
+
+  % Projectile contour plot
+  projectilePlot=plot3(plot_ax,pp_shadow_list(:,1),pp_shadow_list(:,2),pp_shadow_list(:,3),'b.', 'MarkerSize', del_thkns, 'LineWidth', 2);
+  hold(plot_ax, 'on');
+
+  % Target contour plot
+  targetPlot=plot3(plot_ax,tp_shadow_list(:,1),tp_shadow_list(:,2),tp_shadow_list(:,3),'r.', 'MarkerSize', del_thkns, 'LineWidth', 2);
+  hold(plot_ax, 'on');
+
+  % Prism Points Plot
+  %prismPointsPlot=plot3(plot_ax,prismPointsList(:,1),prismPointsList(:,2),prismPointsList(:,3),'k.', 'MarkerSize', del_thkns, 'LineWidth', 0.5, 'DisplayName', 'Acknowledgement Volume');
+
+  % Projectile points plot
+  projectileNucleonsPlot=plot3(plot_ax,projectileNucleons(:,1),projectileNucleons(:,2),projectileNucleons(:,3),'c.', 'MarkerSize', del_thkns, 'LineWidth', 0.5);
+  %hold(plot_ax, 'on');
+
+  % Target points plot
+  %targetNucleonsPlot=plot3(plot_ax,targetNucleons(:,1),targetNucleons(:,2),targetNucleons(:,3),'m.', 'MarkerSize', del_thkns, 'LineWidth', 0.5);
+  %hold(plot_ax, 'on');
+
+  % Projectile participant points plot
+  %projectileParticipantsPlot=plot3(plot_ax,projectileParticipants(:,1),projectileParticipants(:,2),projectileParticipants(:,3),'c.', 'MarkerSize', del_thkns, 'LineWidth', 0.5);
+  %hold(plot_ax, 'on');
+
+  % Target participant points plot
+  %targetParticipantsPlot=plot3(plot_ax,targetParticipants(:,1),targetParticipants(:,2),targetParticipants(:,3),'m.', 'MarkerSize', del_thkns, 'LineWidth', 0.5);
+
+ % Axis and Title setup
+  xlabel(plot_ax, 'X-axis');
+  ylabel(plot_ax, 'Y-axis');
+  zlabel(plot_ax, 'Z-axis');
+  title(plot_ax, 'Projectile Monte Carlo Points');
+  axis(plot_ax, 'equal');
+  %view(plot_ax, 3);
+
+  %view(plot_ax, 0, 90); %XY view (trajectory view, top)
+  view(plot_ax, 155, 20); %pseudo-dimetric
+  %view(plot_ax, 0, 0); %XZ view (trajectory view, side)
+  %view(plot_ax, 90, 0); %YZ view (impact parameter view)
+  %view(plot_ax, 0, 90); %XY view (trajectory view, top)
+
+  grid(plot_ax, 'on');
+
+  drawnow();
+
+  % Save the interactive figure (the only one that will support toggling)
+  savefig(plot_fig, "02-projectile mc points.ofig");
+  % Save the static image for the report (it will show everything ON by default)
+  set(plot_fig, "paperpositionmode", "auto");
+  print(plot_fig, "02-projectile mc points.png", "-dpng");
+  close(plot_fig);
+endif
+
+%Target participant points
+if (plotIt==1)
+  plot_fig=figure("visible", "off");
+  plot_ax=axes("parent", plot_fig);
+
+  % Projectile contour plot
+  projectilePlot=plot3(plot_ax,pp_shadow_list(:,1),pp_shadow_list(:,2),pp_shadow_list(:,3),'b.', 'MarkerSize', del_thkns, 'LineWidth', 2);
+  hold(plot_ax, 'on');
+
+  % Target contour plot
+  targetPlot=plot3(plot_ax,tp_shadow_list(:,1),tp_shadow_list(:,2),tp_shadow_list(:,3),'r.', 'MarkerSize', del_thkns, 'LineWidth', 2);
+  hold(plot_ax, 'on');
+
+  % Prism Points Plot
+  %prismPointsPlot=plot3(plot_ax,prismPointsList(:,1),prismPointsList(:,2),prismPointsList(:,3),'k.', 'MarkerSize', del_thkns, 'LineWidth', 0.5, 'DisplayName', 'Acknowledgement Volume');
+
+  % Projectile points plot
+  %projectileNucleonsPlot=plot3(plot_ax,projectileNucleons(:,1),projectileNucleons(:,2),projectileNucleons(:,3),'k.', 'MarkerSize', del_thkns, 'LineWidth', 0.5);
+  %hold(plot_ax, 'on');
+
+  % Target points plot
+  %targetNucleonsPlot=plot3(plot_ax,targetNucleons(:,1),targetNucleons(:,2),targetNucleons(:,3),'k.', 'MarkerSize', del_thkns, 'LineWidth', 0.5);
+  %hold(plot_ax, 'on');
+
+  % Projectile participant points plot
+  %projectileParticipantsPlot=plot3(plot_ax,projectileParticipants(:,1),projectileParticipants(:,2),projectileParticipants(:,3),'c.', 'MarkerSize', del_thkns, 'LineWidth', 0.5);
+  %hold(plot_ax, 'on');
+
+  % Target participant points plot
+  targetParticipantsPlot=plot3(plot_ax,targetParticipants(:,1),targetParticipants(:,2),targetParticipants(:,3),'m.', 'MarkerSize', del_thkns, 'LineWidth', 0.5);
+
+ % Axis and Title setup
+  xlabel(plot_ax, 'X-axis');
+  ylabel(plot_ax, 'Y-axis');
+  zlabel(plot_ax, 'Z-axis');
+  title(plot_ax, 'Target Participants');
+  axis(plot_ax, 'equal');
+  %view(plot_ax, 3);
+
+  %view(plot_ax, 0, 90); %XY view (trajectory view, top)
+  view(plot_ax, 155, 20); %pseudo-dimetric
+  %view(plot_ax, 0, 0); %XZ view (trajectory view, side)
+  %view(plot_ax, 90, 0); %YZ view (impact parameter view)
+  %view(plot_ax, 0, 90); %XY view (trajectory view, top)
+
+  grid(plot_ax, 'on');
+
+  drawnow();
+
+  % Save the interactive figure (the only one that will support toggling)
+  savefig(plot_fig, "02-target participants.ofig");
+  % Save the static image for the report (it will show everything ON by default)
+  set(plot_fig, "paperpositionmode", "auto");
+  print(plot_fig, "02-target participants.png", "-dpng");
+  close(plot_fig);
+endif
+
 
 %Results report
 disp("[00. ATOMIC MASSES]");
@@ -260,5 +435,5 @@ disp("");
 disp(sprintf("⟹ Nₚ = %.2f", Np));
 
 %Ensure Octave workspace is clean for other parallel projects
-%clear;
-%close all;
+clear;
+close all;
