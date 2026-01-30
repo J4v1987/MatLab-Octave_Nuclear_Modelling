@@ -126,7 +126,7 @@ endfor
 standardDeviationOfDetectedPoints=(sumOfSquaredDifferences/length(listOfDetectedPoints))^(1/2);
 
 %Error propagation
-%From the cuadrature rule: "...Relative errors add in quadrature." (Marek Gierliński. ISBN: 9781119106890. "Understanding Statistical Error : A Primer for Biologists", Chapter 7.3 Multiple variables.)
+%From the quadrature rule: "...Relative errors add in quadrature." (Marek Gierliński. ISBN: 9781119106890. "Understanding Statistical Error : A Primer for Biologists", Chapter 7.3 Multiple variables.)
 % Let:
 % μᵢ: mean of detected e⁻ points (or, script variable: meanDetectedPoints).
 % μⱼ: mean of total emitted e⁻ points (or, user input constant, N).
