@@ -5,6 +5,10 @@
 clear;
 close all;
 
+%Runtime variables
+fs = 8000;              % Sampling frequency (Hz)
+t = 0:1/fs:0.15;        % Duration of each note (0.15 seconds)
+
 %Set project directory.
 if (!strcmp("/home/javier/Documents/Octave/Nuclear Modelling/Problem1",pwd()))
   cd "/home/javier/Documents/Octave/Nuclear Modelling/Problem1"
@@ -55,9 +59,9 @@ for i=1:length(cylinderHeightFaceProfile);
   cylinderHeightFace(end+1,:)=[-cylinderRadius*octantAngle,cylinderRadius*octantAngle,cylinderHeightFaceProfile(i)];
 endfor
 
+%Form a matrix of random p¹(x,y,z) points filling the cylinder volume, volumePoints.
 listOfDetectedPoints=[];
 for i=1:100
-  %Form a matrix of random p¹(x,y,z) points filling the cylinder volume, volumePoints.
   volumePoints=[];
   r1=0;
   phi1=0;
@@ -74,20 +78,52 @@ for i=1:100
   endfor
 
   %Form a matrix of random p²(x,y,z) points weighting the volumetric distribution of p¹(x,y,z) points to meet the essential β⁻-decay irradiation distribution pattern in 3D space.
+  %
+  % DERIVATION OF ISOTROPIC EMISSION PARAMETERS (ISO 80000-2:2009(E))
+  % Goal: Find the probability distribution for the polar angle θ (from pole-to-pole)
+  % to ensure uniform area coverage on a sphere (Isotropy).
+  %
+  % 1. Differential Area Element (dA):
+  %    dA = (R ⋅ dθ) ⋅ [(R ⋅ sinθ) ⋅ dφ]
+  %    dA = R² ⋅ sinθ ⋅ dθ ⋅ dφ
+  %    The probability density function (PDF) is thus proportional to sinθ.
+  %
+  % 2. Normalization of PDF (Weighting factor W):
+  %    Let P(θ) = ∫ W * sinθ dθ over the interval [0, π].
+  %    ∵ 1 = W * ∫[0,π] sinθ dθ
+  %    → 1 = W * [-cosθ][0,π]
+  %    → 1 = W * [(-(-1)) - (-1)]
+  %    → 1 = W * (2)
+  %    ∴ W = 1/2
+  %
+  % 3. Cumulative Distribution Function (CDF):
+  %    Let u be a uniform random number u ∈ [0, 1].
+  %    ∵ u = ∫[0,θ] (1/2) * sin(t) dt
+  %    → u = (1/2) * [-cos(t)][0,θ]
+  %    → u = (1/2) * [1 - cosθ]
+  %    → 2u = 1 - cosθ
+  %    ∴ cosθ = 1 - 2u
+  %    (Note: Since u is uniform [0,1], 1-2u is statistically identical to 2u-1)
+  %
+  % 4. Pythagorean Identity for sinθ:
+  %    ∵sin²θ + cos²θ = 1 (Pythagorean theorem, see: https://mathworld.wolfram.com/PythagoreanTheorem.html)
+  %    ∴ sinθ = sqrt(1 - cos²θ)
   radiationPoints=[];
   r2 = 0;
   phi2 = 0;
-  theta2 = 0;
+  sin_theta2 = 0;
+  cos_theta2=0;
   px2 = 0;
   py2 = 0;
   pz2 = 0;
   for i = 1:length(volumePoints)
     r2=-meanFreePath*reallog(rand());
-    phi2 = 2*pi()*rand();
-    theta2 = pi()*rand();
-    px2 = r2*cos(phi2)+volumePoints(i,1);
-    py2 = r2*sin(phi2)+volumePoints(i,2);
-    pz2 = r2*cos(theta2)+volumePoints(i,3);
+    phi2=2*pi()*rand();
+    cos_theta2=1-(2*rand());
+    sin_theta2=sqrt(1-(cos_theta2^2));
+    px2=(r2*cos(phi2)*sin_theta2)+volumePoints(i,1);
+    py2=(r2*sin(phi2)*sin_theta2)+volumePoints(i,2);
+    pz2=(r2*cos_theta2)+volumePoints(i,3);
     radiationPoints(end+1,:)=[px2,py2,pz2];
   endfor
 
@@ -125,8 +161,9 @@ for i=1:length(listOfDetectedPoints)
 endfor
 standardDeviationOfDetectedPoints=(sumOfSquaredDifferences/length(listOfDetectedPoints))^(1/2);
 
-%Error propagation
-%From the quadrature rule: "...Relative errors add in quadrature." (Marek Gierliński. ISBN: 9781119106890. "Understanding Statistical Error : A Primer for Biologists", Chapter 7.3 Multiple variables.)
+%ERROR PROPAGATION
+%
+%From the cuadrature rule: "...Relative errors add in quadrature." (Marek Gierliński. ISBN: 9781119106890. "Understanding Statistical Error : A Primer for Biologists", Chapter 7.3 Multiple variables.)
 % Let:
 % μᵢ: mean of detected e⁻ points (or, script variable: meanDetectedPoints).
 % μⱼ: mean of total emitted e⁻ points (or, user input constant, N).
@@ -197,18 +234,40 @@ if (plotIt==1)
 endif
 
 %[TERMINAL REPORT SECTION]---------------------------------------------------------------------------------
-
 disp("[00. KEY INPUT PARAMETERS & VARIABLES]");
 disp(sprintf("Number of scattered electrons from β⁻-decay (user input), N: %.2f [e⁻]", N));
 disp(sprintf("Cylinder radius, ρ: %d [mm] ", cylinderRadius));
-disp(sprintf("Cylinder height (entirely filled), H: %d [mm] ", cylinderRadius));
+disp(sprintf("Cylinder height (entirely filled), H: %d [mm] ", cylinderHeight));
 analyticalVolume= (pi()*(cylinderRadius^2))*cylinderHeight;% see: https://mathworld.wolfram.com/Cylinder.html
 disp(sprintf("Analytical cylinder volume, Vₐ: %.5f [mm] (∝π⋅ρ²⋅H, see: https://mathworld.wolfram.com/Cylinder.html) ", analyticalVolume));
 disp(" ");
 disp("[01. DETECTION EFFICIENCY]");
+disp(sprintf("Number of Monte Carlo iterations, Iₘ꜀: %.2f [e⁻]", stat_N));
 disp(sprintf("Mean of the number of detected electrons from β⁻-decay, μ(Nₑ): %.5f±%.5f[e⁻] ", meanDetectedPoints,standardDeviationOfDetectedPoints));
-disp("∵ ""Detection efficiency, ηₑ, is understood as the mean of the number of detected electrons from β⁻-decay, μ(Nₑ), compared to the total number of emitted electrons, N."" ");
+disp(" ");
+disp("∵ ""Detection efficiency"", ηₑ, is understood as the mean of the number of detected electrons from β⁻-decay, μ(Nₑ), compared to the total number of emitted electrons, N. ");
 disp("→ ηₑ = μ(Nₑ)/N");
 disp(sprintf("→ ηₑ = (%.5f[e⁻])/(%.5f[e⁻])", meanDetectedPoints, N));
 disp(sprintf("⟹ ηₑ = %.5f±%.5f", detectionEfficiency, propagatedStandardDeviation));
+disp(" ");
+disp("∵ ""Detection yield"", Y, is understood as the arithmetic product of detection efficiency, ηₑ, and analytical cylinder volume, Vₐ. ");
+disp("→ Y = ηₑ⋅Vₐ");
+detectionYield=detectionEfficiency*analyticalVolume;
+disp(sprintf("→ Y = (%.5f[e⁻])⋅(%.5f[e⁻])", detectionEfficiency, analyticalVolume));
+disp(sprintf("⟹ Y = %.5f±%.5f", detectionYield, propagatedStandardDeviation));
 
+%[EXTERNAL RAW DATA]
+listOfResults=[N,stat_N,meanFreePath,cylinderRadius,cylinderHeight,analyticalVolume,meanDetectedPoints,standardDeviationOfDetectedPoints,detectionEfficiency,propagatedStandardDeviation,detectionYield,propagatedStandardDeviation];
+dlmwrite('Problem2.csv',listOfResults,'-append', 'delimiter', ',', 'newline', 'pc');
+
+% [END OF SCRIPT NOTIFICATION MELODY]
+notes = [523.25, 659.25, 783.99, 1046.50];
+melody = [];
+
+for f = notes
+    % Create a sine wave for the frequency 'f' with a quick fade-out
+    wave = sin(2 * pi * f * t) .* exp(-4 * t);
+    melody = [melody, wave];
+end
+
+sound(melody, fs);
