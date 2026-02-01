@@ -15,12 +15,12 @@ if (!strcmp("/home/javier/Documents/Octave/Nuclear Modelling/Problem1",pwd()))
 endif
 
 %[USER INPUTS]---------------------------------------------------------------------------
-cylinderRadius=input("Enter cylinder radius in [mm]: ");
-cylinderHeight=input("Enter cylinder height in [mm]: ");
-meanFreePath=input("Enter the medium mean free path [mm]: ");
-N=input("Number of Monte Carlo trials per iteration (e.g. 10000): ");    % Number of Monte Carlo random points to be tried in space.
-stat_N=input("Number of Monte Carlo iterations (e.g. 100): ");
-plotIt=yes_or_no("Do you want to see the analysis 3D plot? (may take longer to process)");
+cylinderRadius=input("Enter cylinder radius in [mm], ρ: ");
+cylinderHeight=input("Enter cylinder height in [mm], H: ");
+meanFreePath=input("Enter the medium mean free path [mm], λ: ");
+N=input("Number of Monte Carlo trials per iteration (e.g. 10000), N: ");    % Number of Monte Carlo random points to be tried in space.
+stat_N=input("Number of Monte Carlo iterations (e.g. 100), Iₘ꜀: ");
+plotIt=yes_or_no("Do you want to generate a 3D plot? (may take longer to process)");
 %[END OF USER INPUTS]---------------------------------------------------------------------------
 
 disp(char(10)) ;
@@ -61,7 +61,7 @@ endfor
 
 %Form a matrix of random p¹(x,y,z) points filling the cylinder volume, volumePoints.
 listOfDetectedPoints=[];
-for i=1:100
+for i=1:stat_N
   volumePoints=[];
   r1=0;
   phi1=0;
@@ -163,21 +163,21 @@ standardDeviationOfDetectedPoints=(sumOfSquaredDifferences/length(listOfDetected
 
 %ERROR PROPAGATION
 %
-%From the cuadrature rule: "...Relative errors add in quadrature." (Marek Gierliński. ISBN: 9781119106890. "Understanding Statistical Error : A Primer for Biologists", Chapter 7.3 Multiple variables.)
+%From the cuadrature principle: "...Relative errors add in quadrature." (Marek Gierliński. ISBN: 9781119106890. "Understanding Statistical Error : A Primer for Biologists", Chapter 7.3 Multiple variables.)
 % Let:
-% μᵢ: mean of detected e⁻ points (or, script variable: meanDetectedPoints).
+% μ(Nₑ): mean of detected e⁻ points (or, script variable: meanDetectedPoints).
 % μⱼ: mean of total emitted e⁻ points (or, user input constant, N).
-% σᵢ: standard deviation of detected e⁻ points (or, script variable: standardDeviationOfDetectedPoints).
+% σₑ: standard deviation of detected e⁻ points (or, script variable: standardDeviationOfDetectedPoints).
 % σⱼ: standard deviation of total emitted e⁻ points.
-% σₑ: standard deviation of the ratio of detected e⁻ points and total e⁻ points (or, script variable: propagatedStandardDeviation).
+% σₚ: standard deviation of the ratio of detected e⁻ points and total e⁻ points (or, script variable: propagatedStandardDeviation).
 % ηₑ: ratio of detected e⁻ points and total e⁻ points (or, script varaible: detectionEfficiency).
 %
-% ∵σₑ/ηₑ=sqrt(((σᵢ/μᵢ)^2)+((σⱼ/μⱼ)^2))
-% ∧σⱼ=0 (user input constant, N)
-% →σₑ/ηₑ=sqrt(((σᵢ/μᵢ)^2)+((0/μⱼ)^2))
-% →σₑ=σᵢ⋅(ηₑ/μᵢ)
-% ∧ηₑ=μᵢ/μⱼ
-% ⇒σₑ=σᵢ⋅(1/μⱼ)
+%∵ σₚ/ηₑ=sqrt(((σₑ/μ(Nₑ))^2)+((σⱼ/μⱼ)^2)))  (the Cuadrature Principle)
+%∧ σⱼ=0 	(because of user input constant, N)
+% →σₚ/ηₑ=sqrt(((σₑ/μ(Nₑ))^2)+((0/μⱼ)^2))
+% →σₚ=σₑ⋅(ηₑ/μ(Nₑ))
+% ∧ηₑ=μ(Nₑ)/μⱼ
+% ⇒σₚ=σₑ⋅(1/μⱼ)
 detectionEfficiency=meanDetectedPoints/N;
 propagatedStandardDeviation=standardDeviationOfDetectedPoints*(1/N);
 
@@ -226,10 +226,52 @@ if (plotIt==1)
   drawnow();
 
   % Save the interactive figure (the only one that will support toggling)
-  savefig(plot_fig, "Problem2.ofig");
+  savefig(plot_fig, "Problem2-3Dplot.ofig");
   % Save the static image for the report (it will show everything ON by default)
   set(plot_fig, "paperpositionmode", "auto");
-  print(plot_fig, "Problem2.png", "-dpng");
+  print(plot_fig, "Problem2-3Dplot.png", "-dpng");
+  close(plot_fig);
+endif
+
+if (plotIt==1)
+  plot_fig=figure("visible", "off");
+  plot_ax=axes("parent", plot_fig);
+
+  % Cylinder contour plots of side faces
+  projectilePlot=plot3(cylinderBaseProfile(:,1),cylinderBaseProfile(:,2),cylinderBaseProfile(:,3),'r.', 'MarkerSize', delineantThickness, 'LineWidth', 2);
+  hold(plot_ax, 'on');
+
+  % Cylinder contour plot of height face
+  targetPlot=plot3(plot_ax,cylinderHeightFace(:,1),cylinderHeightFace(:,2),cylinderHeightFace(:,3),'r.', 'MarkerSize', delineantThickness, 'LineWidth', 2);
+  hold(plot_ax, 'on');
+
+  % Cylinder volume points
+  targetPlot=plot3(plot_ax,volumePoints(:,1),volumePoints(:,2),volumePoints(:,3),'m.', 'MarkerSize', delineantThickness/4, 'LineWidth', 2);
+  %hold(plot_ax, 'on');
+
+ % Axis and Title setup
+  xlabel(plot_ax, 'X-axis');
+  ylabel(plot_ax, 'Y-axis');
+  zlabel(plot_ax, 'Z-axis');
+  title(plot_ax, 'Cylinder Plot');
+  axis(plot_ax, 'equal');
+  %view(plot_ax, 3);
+
+  %view(plot_ax, 0, 90); %XY view (trajectory view, top)
+  view(plot_ax, 155, 20); %pseudo-dimetric
+  %view(plot_ax, 0, 0); %XZ view (trajectory view, side)
+  %view(plot_ax, 90, 0); %YZ view (impact parameter view)
+  %view(plot_ax, 0, 90); %XY view (trajectory view, top)
+
+  grid(plot_ax, 'on');
+
+  drawnow();
+
+  % Save the interactive figure (the only one that will support toggling)
+  savefig(plot_fig, "Problem2-MCpoints.ofig");
+  % Save the static image for the report (it will show everything ON by default)
+  set(plot_fig, "paperpositionmode", "auto");
+  print(plot_fig, "Problem2-MCpoints.png", "-dpng");
   close(plot_fig);
 endif
 
@@ -254,10 +296,10 @@ disp("∵ ""Detection yield"", Y, is understood as the arithmetic product of det
 disp("→ Y = ηₑ⋅Vₐ");
 detectionYield=detectionEfficiency*analyticalVolume;
 disp(sprintf("→ Y = (%.5f[e⁻])⋅(%.5f[e⁻])", detectionEfficiency, analyticalVolume));
-disp(sprintf("⟹ Y = %.5f±%.5f", detectionYield, propagatedStandardDeviation));
+disp(sprintf("⟹ Y = %.5f", detectionYield));
 
 %[EXTERNAL RAW DATA]
-listOfResults=[N,stat_N,meanFreePath,cylinderRadius,cylinderHeight,analyticalVolume,meanDetectedPoints,standardDeviationOfDetectedPoints,detectionEfficiency,propagatedStandardDeviation,detectionYield,propagatedStandardDeviation];
+listOfResults=[N,stat_N,meanFreePath,cylinderRadius,cylinderHeight,analyticalVolume,meanDetectedPoints,standardDeviationOfDetectedPoints,detectionEfficiency,propagatedStandardDeviation,detectionYield];
 dlmwrite('Problem2.csv',listOfResults,'-append', 'delimiter', ',', 'newline', 'pc');
 
 % [END OF SCRIPT NOTIFICATION MELODY]
