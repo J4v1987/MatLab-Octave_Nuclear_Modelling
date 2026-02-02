@@ -2,7 +2,7 @@
 %Problem 1: Application of the Participant-Spectator-Model
 
 %Ensure Octave starts fresh
-clear;
+clear all;
 close all;
 
 %Set project directory.
@@ -12,7 +12,7 @@ endif
 
 %[USER INPUTS]---------------------------------------------------------------------------
 %Define input particle analysis constants
-R0=1.2;  % in Femtometres [fm], in consistency with "Introductory Nuclear Physics", by Krane, Kenneth S. ISBN: 0-471-80553-X, page 49.                                                                                                                                                              % SI: [fm].
+R0=1.2;  % in Femtometres [fm], in consistency with "Introductory Nuclear Physics", by Krane, Kenneth S. ISBN: 0-471-80553-X, page 48.                                                                                                                                                              % SI: [fm].
 Ap=input("Projectile atomic mass [u] or [g⋅mol⁻¹]: ");                                                                               % Projectile particle mass number in absolute value, e.g. Ap(C)=12[u]→12.
 At=input("Target atomic mass [u] or [g⋅mol⁻¹]: ");                                                                                     % Target particle mass number in absolute value, e.g. At(Au)=197[u]→197.
 Ep=input("Projectile-target impact parameter scaling factor (100: just disengaged, 0: center to center): ");        % Impact parameter engagement percentage, 100: just disengaged, 0: center to center
@@ -182,10 +182,10 @@ if (plotIt==1)
   drawnow();
 
   % Save the interactive figure (the only one that will support toggling)
-  savefig(plot_fig, "02-projectile participants.ofig");
+  savefig(plot_fig, "Problem1 - projectile participants.ofig");
   % Save the static image for the report (it will show everything ON by default)
   set(plot_fig, "paperpositionmode", "auto");
-  print(plot_fig, "02-projectile participants.png", "-dpng");
+  print(plot_fig, "Problem1 - projectile participants.png", "-dpng");
   close(plot_fig);
 endif
 
@@ -241,10 +241,10 @@ if (plotIt==1)
   drawnow();
 
   % Save the interactive figure (the only one that will support toggling)
-  savefig(plot_fig, "02-target mc points.ofig");
+  savefig(plot_fig, "Problem1 - target mc points.ofig");
   % Save the static image for the report (it will show everything ON by default)
   set(plot_fig, "paperpositionmode", "auto");
-  print(plot_fig, "02-target mc points.png", "-dpng");
+  print(plot_fig, "Problem1 - target mc points.png", "-dpng");
   close(plot_fig);
 endif
 
@@ -299,10 +299,10 @@ if (plotIt==1)
   drawnow();
 
   % Save the interactive figure (the only one that will support toggling)
-  savefig(plot_fig, "02-projectile mc points.ofig");
+  savefig(plot_fig, "Problem1 - projectile mc points.ofig");
   % Save the static image for the report (it will show everything ON by default)
   set(plot_fig, "paperpositionmode", "auto");
-  print(plot_fig, "02-projectile mc points.png", "-dpng");
+  print(plot_fig, "Problem1 - projectile mc points.png", "-dpng");
   close(plot_fig);
 endif
 
@@ -356,10 +356,10 @@ if (plotIt==1)
   drawnow();
 
   % Save the interactive figure (the only one that will support toggling)
-  savefig(plot_fig, "02-target participants.ofig");
+  savefig(plot_fig, "Problem1 - target participants.ofig");
   % Save the static image for the report (it will show everything ON by default)
   set(plot_fig, "paperpositionmode", "auto");
-  print(plot_fig, "02-target participants.png", "-dpng");
+  print(plot_fig, "Problem1 - target participants.png", "-dpng");
   close(plot_fig);
 endif
 
@@ -370,13 +370,13 @@ disp(sprintf("Ap: Projectile particle atomic mass: %d [u] ", Ap));
 disp(sprintf("At: Target particle atomic mass: %d [u] ", At));
 disp(" ");
 disp("[01. NUCLEI RADII & MAXIMUM IMPACT PARAMETER]");
-disp("∵ R=R₀⋅A^1/3 (Kenneth S Krane. ISBN: 0-471-80553-X, page 49.)");
-disp(sprintf("∧ R₀= %.2f [fm] (Kenneth S. Krane. ISBN: 0-471-80553-X, page 49.) ", R0));
+disp("∵ R=R₀⋅A^1/3 (Kenneth S Krane. ISBN: 0-471-80553-X, page 48.)");
+disp(sprintf("∧ R₀= %.2f [fm] (Kenneth S. Krane. ISBN: 0-471-80553-X, page 48.) ", R0));
 disp(sprintf("∧ A= %.2f [u] (user input, script variable Ap)", Ap));
 disp(sprintf("⟹ R(Ap)=Rp= %.2f [fm]", (R0*(Ap^(1/3)))));
 disp("");
-disp("∵ R=R₀⋅A^1/3 (Kenneth S. Krane. ISBN: 0-471-80553-X, page 49.)");
-disp(sprintf("∧ R₀= %.2f [fm] (Kenneth S. Krane. ISBN: 0-471-80553-X, page 49.) ", R0));
+disp("∵ R=R₀⋅A^1/3 (Kenneth S. Krane. ISBN: 0-471-80553-X, page 48.)");
+disp(sprintf("∧ R₀= %.2f [fm] (Kenneth S. Krane. ISBN: 0-471-80553-X, page 48.) ", R0));
 disp(sprintf("∧ A= %.2f [u] (user input, script variable Ap)", At));
 disp(sprintf("⟹ R(At)=Rt= %.2f [fm]", (R0*(At^(1/3)))));
 disp("");
