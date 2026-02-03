@@ -61,6 +61,7 @@ for i=1:length(cylinderHeightFaceProfile);
 endfor
 
 %Form a matrix of random p¹(x,y,z) points filling the cylinder volume, volumePoints.
+listOfDetectedPoints=[];
 for i=1:stat_N
   volumePoints=[];
   r1=0;
@@ -140,7 +141,6 @@ for i=1:stat_N
   arrayOfGamma2=[];
   allGammasDetected=[];
   tmpVector=[];
-  listOfDetectedPoints=[];
   for i=1:length(radiationPoints)
     phi3=2*pi()*rand();
     cos_theta3=1-2*rand();
@@ -169,20 +169,6 @@ for i=1:stat_N
   endfor
   allGammasDetected=[arrayOfGamma1, arrayOfGamma2];
   listOfDetectedPoints(end+1)=length(allGammasDetected);
-  %Form a matrix of random p³(x,y,z) points, located above z=cylinderHeight, and within the extrusion scope along z-axis of x²+y²=cylinderRadius².
-  %detectedPoints=[];
-  %px3=0;
-  %py3=0;
-  %pz3=0;
-  %for i=1:length(radiationPoints)
-    %px3=radiationPoints(i,1);
-    %py3=radiationPoints(i,2);
-    %pz3=radiationPoints(i,3);
-    %if((((px3)^2+(py3)^2)<((cylinderRadius)^2)) && (pz3>cylinderHeight))
-      %detectedPoints(end+1,:)=[px3,py3,pz3];
-    %endif
-  %endfor
-  %listOfDetectedPoints(end+1)=length(detectedPoints);
 endfor
 
 %[STATISTICAL ANALYSIS]----------------------------------------------------------------------------------------
