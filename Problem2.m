@@ -1,5 +1,6 @@
 %Student Laboratories
-%Problem 2:
+%Problem 2
+%Space coordinates given in terms of a right-handed spherical coordinate system as per ISO 80000-2:2009(E) in euclidean space, Eⁿ.
 
 %Ensure Octave starts fresh
 clear;
@@ -20,7 +21,7 @@ cylinderHeight=input("Enter cylinder height in [mm], H: ");
 meanFreePath=input("Enter the medium mean free path [mm], λ: ");
 N=input("Number of Monte Carlo trials per iteration (e.g. 10000), N: ");    % Number of Monte Carlo random points to be tried in space.
 stat_N=input("Number of Monte Carlo iterations (e.g. 100), Iₘ꜀: ");
-plotIt=yes_or_no("Do you want to generate a 3D plot? (may take longer to process)");
+%plotIt=yes_or_no("Do you want to generate a 3D plot? (may take longer to process)");
 %[END OF USER INPUTS]---------------------------------------------------------------------------
 
 disp(char(10)) ;
@@ -60,7 +61,7 @@ for i=1:length(cylinderHeightFaceProfile);
 endfor
 
 %Form a matrix of random p¹(x,y,z) points filling the cylinder volume, volumePoints.
-listOfDetectedPoints=[];
+listOfDetectedPoints=zeros(N, 3); % Pre-allocate full size;
 for i=1:stat_N
   volumePoints=[];
   r1=0;
@@ -74,7 +75,7 @@ for i=1:stat_N
     px1=r1*cos(phi1);
     py1=r1*sin(phi1);
     pz1=cylinderHeight*rand();
-    volumePoints(end+1,:)=[px1,py1,pz1];
+    volumePoints(i,:)=[px1,py1,pz1];
   endfor
 
   %Form a matrix of random p²(x,y,z) points weighting the volumetric distribution of p¹(x,y,z) points to meet the essential β⁻-decay irradiation distribution pattern in 3D space.
@@ -109,6 +110,7 @@ for i=1:stat_N
   %    ∵sin²θ + cos²θ = 1 (Pythagorean theorem, see: https://mathworld.wolfram.com/PythagoreanTheorem.html)
   %    ∴ sinθ = sqrt(1 - cos²θ)
   radiationPoints=[];
+  gamma_rays=[];
   r2 = 0;
   phi2 = 0;
   sin_theta2 = 0;
@@ -124,23 +126,63 @@ for i=1:stat_N
     px2=(r2*cos(phi2)*sin_theta2)+volumePoints(i,1);
     py2=(r2*sin(phi2)*sin_theta2)+volumePoints(i,2);
     pz2=(r2*cos_theta2)+volumePoints(i,3);
-    radiationPoints(end+1,:)=[px2,py2,pz2];
+    radiationPoints(:,end+1)=[px2;py2;pz2];
   endfor
 
-  %Form a matrix of random p³(x,y,z) points, located above z=cylinderHeight, and within the extrusion scope along z-axis of x²+y²=cylinderRadius².
-  detectedPoints=[];
-  px3=0;
-  py3=0;
-  pz3=0;
+  %Form a matrix of random p³(x,y,z) points representing all detected gamma rays (photons).
+  %Assumes every p²(x,y,z) recoils two p³(x,y,z) points into gamma-ray vectors, with slopes mGamma1,mGamma2, and directionality unitVector.
+  phi3=0;
+  cos_theta3=0;
+  sin_theta3=0;
+  unitVector=[];
+  mGamma1=0;
+  mGamma2=0;
+  arrayOfGamma1=[];
+  arrayOfGamma2=[];
+  allGammasDetected=[];
+  tmpVector=[];
   for i=1:length(radiationPoints)
-    px3=radiationPoints(i,1);
-    py3=radiationPoints(i,2);
-    pz3=radiationPoints(i,3);
-    if((((px3)^2+(py3)^2)<((cylinderRadius)^2)) && (pz3>cylinderHeight))
-      detectedPoints(end+1,:)=[px3,py3,pz3];
+    phi3=2*pi()*rand();
+    cos_theta3=1-2*rand();
+    sin_theta3=sqrt(1-cos_theta3);
+    unitVector=[1*sin_theta3*cos(phi3); 1*sin_theta3*sin(phi3); 1*cos_theta3];
+    mGamma1=(cylinderHeight-pz2)/cos_theta3;
+    mGamma2=-mGamma1;
+    if (mGamma1>0 && pz2<=cylinderHeight) % if the photon is heading towards the detector position in Eⁿ z=cylinderHeight and it is originated from p2Coordinates, assume it may be detected.
+      gammaOneCoordinateX=radiationPoints(1,i)+mGamma1*unitVector(1,:);
+      gammaOneCoordinateY=radiationPoints(2,i)+mGamma1*unitVector(2,:);
+      gammaOneCoordinateZ=radiationPoints(3,i)+mGamma1*unitVector(3,:);
+      if(((gammaOneCoordinateX^2)+(gammaOneCoordinateY^2))<(cylinderRadius^2))
+        tmpVector=[gammaOneCoordinateX;gammaOneCoordinateY;gammaOneCoordinateZ]; %temporary array to annotate the 3D coordinates of Gamma 1 particle on detection.
+        arrayOfGamma1(:,end+1)=tmpVector;%Gamma 1 has been detected and listed!
+      endif
+    endif
+    if (mGamma2>0 && pz2<=cylinderHeight)% if the photon is heading towards the detector position in Eⁿ z=cylinderHeight and it is originated from p2Coordinates, assume it may be detected.
+      gammaTwoCoordinateX=radiationPoints(1,i)+mGamma2*unitVector(1,:);
+      gammaTwoCoordinateY=radiationPoints(2,i)+mGamma2*unitVector(2,:);
+      gammaTwoCoordinateZ=radiationPoints(3,i)+mGamma2*unitVector(3,:);
+      if(((gammaOneCoordinateX^2)+(gammaOneCoordinateY^2))<(cylinderRadius^2))
+        tmpVector=[gammaTwoCoordinateX;gammaTwoCoordinateY;gammaTwoCoordinateZ]; %temporary array to annotate the 3D coordinates of Gamma 2 particle on detection.
+        arrayOfGamma2(:,end+1)=tmpVector;%Gamma 2 has been detected and listed!
+      endif
     endif
   endfor
-  listOfDetectedPoints(end+1)=length(detectedPoints);
+  allGammasDetected=[arrayOfGamma1, arrayOfGamma2];
+  listOfDetectedPoints(end+1)=length(allGammasDetected);
+  %Form a matrix of random p³(x,y,z) points, located above z=cylinderHeight, and within the extrusion scope along z-axis of x²+y²=cylinderRadius².
+  %detectedPoints=[];
+  %px3=0;
+  %py3=0;
+  %pz3=0;
+  %for i=1:length(radiationPoints)
+    %px3=radiationPoints(i,1);
+    %py3=radiationPoints(i,2);
+    %pz3=radiationPoints(i,3);
+    %if((((px3)^2+(py3)^2)<((cylinderRadius)^2)) && (pz3>cylinderHeight))
+      %detectedPoints(end+1,:)=[px3,py3,pz3];
+    %endif
+  %endfor
+  %listOfDetectedPoints(end+1)=length(detectedPoints);
 endfor
 
 %[STATISTICAL ANALYSIS]----------------------------------------------------------------------------------------
@@ -181,103 +223,9 @@ standardDeviationOfDetectedPoints=(sumOfSquaredDifferences/length(listOfDetected
 detectionEfficiency=meanDetectedPoints/N;
 propagatedStandardDeviation=standardDeviationOfDetectedPoints*(1/N);
 
-%[PLOTTER SECTION, LAST MONTE CARLO ITERATION ONLY]-------------------------------------
-%Plot Target monte carlo points
-if (plotIt==1)
-  plot_fig=figure("visible", "off");
-  plot_ax=axes("parent", plot_fig);
-
-  % Cylinder contour plots of side faces
-  projectilePlot=plot3(cylinderBaseProfile(:,1),cylinderBaseProfile(:,2),cylinderBaseProfile(:,3),'r.', 'MarkerSize', delineantThickness, 'LineWidth', 2);
-  hold(plot_ax, 'on');
-
-  % Cylinder contour plot of height face
-  targetPlot=plot3(plot_ax,cylinderHeightFace(:,1),cylinderHeightFace(:,2),cylinderHeightFace(:,3),'r.', 'MarkerSize', delineantThickness, 'LineWidth', 2);
-  hold(plot_ax, 'on');
-
-  % Cylinder volume points
-  %targetPlot=plot3(plot_ax,volumePoints(:,1),volumePoints(:,2),volumePoints(:,3),'m.', 'MarkerSize', delineantThickness/4, 'LineWidth', 2);
-  %hold(plot_ax, 'on');
-
-  % Radiation points
-  targetPlot=plot3(plot_ax,radiationPoints(:,1),radiationPoints(:,2),radiationPoints(:,3), '.', 'LineStyle', 'none', 'Color', [0, 0.5, 0], 'MarkerSize', delineantThickness/2, 'LineWidth', 2);
-  hold(plot_ax, 'on');
-
-  % Detected points
-  targetPlot=plot3(plot_ax,detectedPoints(:,1),detectedPoints(:,2),detectedPoints(:,3),'b.', 'MarkerSize', delineantThickness/2, 'LineWidth', 2);
-  %hold(plot_ax, 'on');
-
- % Axis and Title setup
-  xlabel(plot_ax, 'X-axis');
-  ylabel(plot_ax, 'Y-axis');
-  zlabel(plot_ax, 'Z-axis');
-  title(plot_ax, 'Cylinder Plot');
-  axis(plot_ax, 'equal');
-  %view(plot_ax, 3);
-
-  %view(plot_ax, 0, 90); %XY view (trajectory view, top)
-  view(plot_ax, 155, 20); %pseudo-dimetric
-  %view(plot_ax, 0, 0); %XZ view (trajectory view, side)
-  %view(plot_ax, 90, 0); %YZ view (impact parameter view)
-  %view(plot_ax, 0, 90); %XY view (trajectory view, top)
-
-  grid(plot_ax, 'on');
-
-  drawnow();
-
-  % Save the interactive figure (the only one that will support toggling)
-  savefig(plot_fig, "Problem2-3Dplot.ofig");
-  % Save the static image for the report (it will show everything ON by default)
-  set(plot_fig, "paperpositionmode", "auto");
-  print(plot_fig, "Problem2-3Dplot.png", "-dpng");
-  close(plot_fig);
-endif
-
-if (plotIt==1)
-  plot_fig=figure("visible", "off");
-  plot_ax=axes("parent", plot_fig);
-
-  % Cylinder contour plots of side faces
-  projectilePlot=plot3(cylinderBaseProfile(:,1),cylinderBaseProfile(:,2),cylinderBaseProfile(:,3),'r.', 'MarkerSize', delineantThickness, 'LineWidth', 2);
-  hold(plot_ax, 'on');
-
-  % Cylinder contour plot of height face
-  targetPlot=plot3(plot_ax,cylinderHeightFace(:,1),cylinderHeightFace(:,2),cylinderHeightFace(:,3),'r.', 'MarkerSize', delineantThickness, 'LineWidth', 2);
-  hold(plot_ax, 'on');
-
-  % Cylinder volume points
-  targetPlot=plot3(plot_ax,volumePoints(:,1),volumePoints(:,2),volumePoints(:,3),'m.', 'MarkerSize', delineantThickness/4, 'LineWidth', 2);
-  %hold(plot_ax, 'on');
-
- % Axis and Title setup
-  xlabel(plot_ax, 'X-axis');
-  ylabel(plot_ax, 'Y-axis');
-  zlabel(plot_ax, 'Z-axis');
-  title(plot_ax, 'Cylinder Plot');
-  axis(plot_ax, 'equal');
-  %view(plot_ax, 3);
-
-  %view(plot_ax, 0, 90); %XY view (trajectory view, top)
-  view(plot_ax, 155, 20); %pseudo-dimetric
-  %view(plot_ax, 0, 0); %XZ view (trajectory view, side)
-  %view(plot_ax, 90, 0); %YZ view (impact parameter view)
-  %view(plot_ax, 0, 90); %XY view (trajectory view, top)
-
-  grid(plot_ax, 'on');
-
-  drawnow();
-
-  % Save the interactive figure (the only one that will support toggling)
-  savefig(plot_fig, "Problem2-MCpoints.ofig");
-  % Save the static image for the report (it will show everything ON by default)
-  set(plot_fig, "paperpositionmode", "auto");
-  print(plot_fig, "Problem2-MCpoints.png", "-dpng");
-  close(plot_fig);
-endif
-
 %[TERMINAL REPORT SECTION]---------------------------------------------------------------------------------
 disp("[00. KEY INPUT PARAMETERS & VARIABLES]");
-disp(sprintf("Number of scattered electrons from β⁻-decay (user input), N: %.2f [e⁻]", N));
+disp(sprintf("Number of scattered positrons (seeds of ɣ-rays / photons), N: %.2f [e⁺]", N));
 disp(sprintf("Cylinder radius, ρ: %d [mm] ", cylinderRadius));
 disp(sprintf("Cylinder height (entirely filled), H: %d [mm] ", cylinderHeight));
 analyticalVolume= (pi()*(cylinderRadius^2))*cylinderHeight;% see: https://mathworld.wolfram.com/Cylinder.html
@@ -285,17 +233,17 @@ disp(sprintf("Analytical cylinder volume, Vₐ: %.5f [mm³] (∝π⋅ρ²⋅H, s
 disp(" ");
 disp("[01. DETECTION EFFICIENCY]");
 disp(sprintf("Number of Monte Carlo iterations, Iₘ꜀: %.2f [iterations]", stat_N));
-disp(sprintf("Mean of the number of detected electrons from β⁻-decay, μ(Nₑ): %.5f±%.5f[e⁻] ", meanDetectedPoints,standardDeviationOfDetectedPoints));
+disp(sprintf("Mean of the number of detected ɣ-rays / photons, μ(Nₑ): %.5f±%.5f[ɣ] ", meanDetectedPoints,standardDeviationOfDetectedPoints));
 disp(" ");
-disp("∵ ""Detection efficiency"", ηₑ, is understood as the mean of the number of detected electrons from β⁻-decay, μ(Nₑ), compared to the total number of emitted electrons, N. ");
+disp("∵ ""Detection efficiency"", ηₑ, is understood as the mean of the number of detected ɣ-rays / photons, μ(Nₑ), compared to the total number of positrons, N. ");
 disp("→ ηₑ = μ(Nₑ)/N");
-disp(sprintf("→ ηₑ = (%.5f[e⁻])/(%.5f[e⁻])", meanDetectedPoints, N));
+disp(sprintf("→ ηₑ = (%.5f[ɣ])/(%.5f[e⁺])", meanDetectedPoints, N));
 disp(sprintf("⟹ ηₑ = %.5f±%.5f", detectionEfficiency, propagatedStandardDeviation));
 disp(" ");
 disp("∵ ""Detection yield"", Y, is understood as the arithmetic product of detection efficiency, ηₑ, and analytical cylinder volume, Vₐ. ");
 disp("→ Y = ηₑ⋅Vₐ");
 detectionYield=detectionEfficiency*analyticalVolume;
-disp(sprintf("→ Y = (%.5f[e⁻])⋅(%.5f[e⁻]) [mm³]", detectionEfficiency, analyticalVolume));
+disp(sprintf("→ Y = (%.5f[e⁻])⋅(%.5f[e⁻] [mm³])", detectionEfficiency, analyticalVolume));
 disp(sprintf("⟹ Y = %.5f [mm³]", detectionYield));
 
 %[EXTERNAL RAW DATA]
