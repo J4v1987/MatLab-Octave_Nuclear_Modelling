@@ -61,7 +61,6 @@ for i=1:length(cylinderHeightFaceProfile);
 endfor
 
 %Form a matrix of random p¹(x,y,z) points filling the cylinder volume, volumePoints.
-listOfDetectedPoints=[];
 for i=1:stat_N
   volumePoints=[];
   r1=0;
@@ -75,7 +74,7 @@ for i=1:stat_N
     px1=r1*cos(phi1);
     py1=r1*sin(phi1);
     pz1=cylinderHeight*rand();
-    volumePoints(end+1,:)=[px1,py1,pz1];
+    volumePoints(i,:)=[px1,py1,pz1];
   endfor
 
   %Form a matrix of random p²(x,y,z) points weighting the volumetric distribution of p¹(x,y,z) points to meet the essential β⁻-decay irradiation distribution pattern in 3D space.
@@ -141,6 +140,7 @@ for i=1:stat_N
   arrayOfGamma2=[];
   allGammasDetected=[];
   tmpVector=[];
+  listOfDetectedPoints=[];
   for i=1:length(radiationPoints)
     phi3=2*pi()*rand();
     cos_theta3=1-2*rand();
@@ -152,16 +152,16 @@ for i=1:stat_N
       gammaOneCoordinateX=radiationPoints(1,i)+mGamma1*unitVector(1,:);
       gammaOneCoordinateY=radiationPoints(2,i)+mGamma1*unitVector(2,:);
       gammaOneCoordinateZ=radiationPoints(3,i)+mGamma1*unitVector(3,:);
-      if(((gammaOneCoordinateX^2)+(gammaOneCoordinateY^2))<sqrt(cylinderRadius))
-        tmpVector=[gammaOneCoordinateX;gammaOneCoordinateY;gammaOneCoordinateZ]; %temporary array to annotate the 3D coordinates of Gamma 1 particle on detection.
-        arrayOfGamma1(:,end+1)=tmpVector;%Gamma 1 has been detected and listed!
+      if(((gammaOneCoordinateX^2)+(gammaOneCoordinateY^2))<(cylinderRadius^2))
+          tmpVector=[gammaOneCoordinateX;gammaOneCoordinateY;gammaOneCoordinateZ]; %temporary array to annotate the 3D coordinates of Gamma 1 particle on detection.
+          arrayOfGamma1(:,end+1)=tmpVector;%Gamma 1 has been detected and listed!
       endif
     endif
     if (mGamma2>0 && pz2<=cylinderHeight)% if the photon is heading towards the detector position in Eⁿ z=cylinderHeight and it is originated from p2Coordinates, assume it may be detected.
       gammaTwoCoordinateX=radiationPoints(1,i)+mGamma2*unitVector(1,:);
       gammaTwoCoordinateY=radiationPoints(2,i)+mGamma2*unitVector(2,:);
       gammaTwoCoordinateZ=radiationPoints(3,i)+mGamma2*unitVector(3,:);
-      if(((gammaOneCoordinateX^2)+(gammaOneCoordinateY^2))<sqrt(cylinderRadius))
+      if(((gammaTwoCoordinateX^2)+(gammaTwoCoordinateY^2))<(cylinderRadius^2))
         tmpVector=[gammaTwoCoordinateX;gammaTwoCoordinateY;gammaTwoCoordinateZ]; %temporary array to annotate the 3D coordinates of Gamma 2 particle on detection.
         arrayOfGamma2(:,end+1)=tmpVector;%Gamma 2 has been detected and listed!
       endif
