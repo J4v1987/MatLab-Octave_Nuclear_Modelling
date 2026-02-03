@@ -243,7 +243,7 @@ disp(" ");
 disp("∵ ""Detection yield"", Y, is understood as the arithmetic product of detection efficiency, ηₑ, and analytical cylinder volume, Vₐ. ");
 disp("→ Y = ηₑ⋅Vₐ");
 detectionYield=detectionEfficiency*analyticalVolume;
-disp(sprintf("→ Y = (%.5f[e⁻])⋅(%.5f[e⁻] [mm³])", detectionEfficiency, analyticalVolume));
+disp(sprintf("→ Y = (%.5f)⋅(%.5f[mm³])", detectionEfficiency, analyticalVolume));
 disp(sprintf("⟹ Y = %.5f [mm³]", detectionYield));
 
 %[EXTERNAL RAW DATA]
