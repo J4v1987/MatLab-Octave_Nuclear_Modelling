@@ -281,10 +281,10 @@ disp(sprintf("Number of scattered electrons from β⁻-decay (user input), N: %.
 disp(sprintf("Cylinder radius, ρ: %d [mm] ", cylinderRadius));
 disp(sprintf("Cylinder height (entirely filled), H: %d [mm] ", cylinderHeight));
 analyticalVolume= (pi()*(cylinderRadius^2))*cylinderHeight;% see: https://mathworld.wolfram.com/Cylinder.html
-disp(sprintf("Analytical cylinder volume, Vₐ: %.5f [mm] (∝π⋅ρ²⋅H, see: https://mathworld.wolfram.com/Cylinder.html) ", analyticalVolume));
+disp(sprintf("Analytical cylinder volume, Vₐ: %.5f [mm³] (∝π⋅ρ²⋅H, see: https://mathworld.wolfram.com/Cylinder.html) ", analyticalVolume));
 disp(" ");
 disp("[01. DETECTION EFFICIENCY]");
-disp(sprintf("Number of Monte Carlo iterations, Iₘ꜀: %.2f [e⁻]", stat_N));
+disp(sprintf("Number of Monte Carlo iterations, Iₘ꜀: %.2f [iterations]", stat_N));
 disp(sprintf("Mean of the number of detected electrons from β⁻-decay, μ(Nₑ): %.5f±%.5f[e⁻] ", meanDetectedPoints,standardDeviationOfDetectedPoints));
 disp(" ");
 disp("∵ ""Detection efficiency"", ηₑ, is understood as the mean of the number of detected electrons from β⁻-decay, μ(Nₑ), compared to the total number of emitted electrons, N. ");
@@ -295,8 +295,8 @@ disp(" ");
 disp("∵ ""Detection yield"", Y, is understood as the arithmetic product of detection efficiency, ηₑ, and analytical cylinder volume, Vₐ. ");
 disp("→ Y = ηₑ⋅Vₐ");
 detectionYield=detectionEfficiency*analyticalVolume;
-disp(sprintf("→ Y = (%.5f[e⁻])⋅(%.5f[e⁻])", detectionEfficiency, analyticalVolume));
-disp(sprintf("⟹ Y = %.5f", detectionYield));
+disp(sprintf("→ Y = (%.5f[e⁻])⋅(%.5f[e⁻]) [mm³]", detectionEfficiency, analyticalVolume));
+disp(sprintf("⟹ Y = %.5f [mm³]", detectionYield));
 
 %[EXTERNAL RAW DATA]
 listOfResults=[N,stat_N,meanFreePath,cylinderRadius,cylinderHeight,analyticalVolume,meanDetectedPoints,standardDeviationOfDetectedPoints,detectionEfficiency,propagatedStandardDeviation,detectionYield];
